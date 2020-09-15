@@ -1,15 +1,24 @@
 REM Installation following the instructions in 
 REM https://htmlpreview.github.io/?https://github.com/DOCGroup/ACE_TAO/blob/master/ACE/ACE-INSTALL.html#unix
-set ACE_ROOT=%SRC_DIR%/ACE_wrappers 
+set ACE_ROOT=%SRC_DIR%
+set TAO_ROOT=%SRC_DIR%\TAO
+set WORKSPACE=%TAO_ROOT%\TAO_ACE
+set ACE_SOURCE_PATH=%ACE_ROOT%\ace
 
-cd %ACE_ROOT%
-
-set SLN_FILE=ACE_v14.sln
+set SLN_FILE=%WORKSPACE%.sln
 set SLN_CFG=Release
 set SLN_PLAT=x64
 
+REM Configure step
+cd %ACE_ROOT%
+perl %ACE_ROOT%\bin\mwc.pl -type vs2017 -features "uses_wchar=1,zlib=1,ssl=1,openssl11=1" %TAO_ROOT%\TAO_ACE.mwc
+
+REM Create config.h file
+echo #include "ace/config-windows.h" > %ACE_SOURCE_PATH%\config.h
+
 REM Build step
-msbuild "%SLN_FILE%" /p:Configuration=%SLN_CFG%,Platform=%SLN_PLAT%,PlatformToolset=v140
+echo "Executing msbuild %SLN_FILE% /p:Configuration=%SLN_CFG%,Platform=%SLN_PLAT%,PlatformToolset=v141"
+msbuild %SLN_FILE% /p:Configuration=%SLN_CFG%,Platform=%SLN_PLAT%,PlatformToolset=v141
 if errorlevel 1 exit 1
 
 REM Install libraries 

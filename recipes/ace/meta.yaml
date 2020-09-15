@@ -1,13 +1,13 @@
 {% set name = "ace" %}
-{% set version = "6.5.6" %}
+{% set version = "6.5.11" %}
 
 package:
   name: {{ name }}
   version: {{ version }}
 
 source:
-  - url: https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-6_5_6/ACE+TAO-6.5.6.tar.bz2
-    sha256: db3abf59e26a2128d8901f80ae359c58c62a0c59f59c6870f9c07d7872487069
+  - url: https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-6_5_11/ACE+TAO-6.5.11.zip
+    sha256: ea617bd526cfd3638675912fbcf40d1e34669c33705f356ab035dcaae311f12f
 
 build:
   number: 0
@@ -16,7 +16,16 @@ requirements:
   build:
     - {{ compiler('cxx') }}
     - {{ compiler('c') }}
-    - make                               # [not win]
+    - vs2017_win-64          # [win64]
+    - vs2017_win-32          # [win32]
+    - make                   # [not win]
+    - perl
+  host:
+    - openssl
+    - zlib
+  run:
+    - openssl
+    - zlib
     
 test:
   commands:
