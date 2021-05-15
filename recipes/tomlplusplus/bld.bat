@@ -3,6 +3,9 @@ setlocal EnableDelayedExpansion
 
 :: meson options
 set ^"MESON_OPTIONS=^
+  -Dgenerate_cmake_config=true ^
+  -Dbuild_tests=false ^
+  -Dbuild_examples=false ^
   --prefix="%LIBRARY_PREFIX%" ^
   --backend=ninja ^
  ^"
