@@ -32,12 +32,12 @@ requirements:
 test:
   commands:
     - test -f ${PREFIX}/include/pxr/pxr.h  # [not win]
-    - test -f ${PREFIX}/lib/libusd_ms.so  # [linux]
-    - test -f ${PREFIX}/lib/libusd_ms.dylib  # [osx]
+    - test -f ${PREFIX}/lib/libusd.so  # [linux]
+    - test -f ${PREFIX}/lib/libusd.dylib  # [osx]
     - test -f ${PREFIX}/pxrConfig.cmake  # [not win]
     - if not exist %PREFIX%\\Library\\include\\pxr\\pxr.h exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\lib\\usd_ms.lib exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\bin\\usd_ms.dll exit 1  # [win]
+    - if not exist %PREFIX%\\Library\\lib\\usd.lib exit 1  # [win]
+    - if not exist %PREFIX%\\Library\\bin\\usd.dll exit 1  # [win]
     - if not exist %PREFIX%\\Library\\pxrConfig.cmake exit 1  # [win]
 
 about:
