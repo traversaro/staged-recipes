@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json
+schema_version: 1
+
+context:
+  version: "1.0.0"
+
+package:
+  name: feetech-servo-sdk
+  version: ${{ version }}
+
+source:
+  - url: https://pypi.org/packages/source/f/feetech-servo-sdk/feetech-servo-sdk-${{ version }}.tar.gz
+    sha256: d4d3832e4b1b22a8222133a414db9f868224c2fb639426a1b11d96ddfe84e69c
+
+build:
+  script: ${{ PYTHON }} -m pip install --no-deps --no-build-isolation .
+  number: 0
+  noarch: python
+
+requirements:
+  host:
+    - python ${{ python_min }}.*
+    - pip
+  run:
+    - python >=${{ python_min }}
+    - pyserial
+
+tests:
+  - python:
+      imports:
+        - scservo_sdk
+      pip_check: true
+      python_version: ${{ python_min }}.*
+
+about:
+  summary: Feetech SDK.
+  license: Unlicense
+  license_file: LICENSE
+  homepage: https://github.com/Adam-Software/FEETECH-Servo-Python-SDK
+
+extra:
+  recipe-maintainers:
+    - traversaro
