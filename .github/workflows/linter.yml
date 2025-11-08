@@ -52,7 +52,7 @@ jobs:
         run: |
           python .github/workflows/scripts/linter.py \
             --owner=${{ github.repository_owner }} \
-            --pr-num=${{ github.event.number }} \
+            --pr-num=${{ github.event.number || github.event.issue.number }} \
           >> $GITHUB_STEP_SUMMARY
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
