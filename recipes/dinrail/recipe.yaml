@@ -1,0 +1,181 @@
+schema_version: 1
+
+context:
+  version: "0.0.1"
+
+recipe:
+  name: dinrail-split
+  version: ${{ version }}
+
+source:
+  git: https://github.com/gbionics/dinrail.git
+  # Latest commit from PR #14 branch (no release tags yet)
+  rev: 8a4037bc19e0ca3405a5606cc08761699092a6f5
+
+outputs:
+  - package:
+      name: libdinrail
+    build:
+      number: 0
+      script:
+        - cmake -S src/core -B build-libdinrail -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
+        - cmake --build build-libdinrail -j ${CPU_COUNT}
+        - cmake --install build-libdinrail
+    requirements:
+      build:
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - cmake
+        - ninja
+        - pkg-config
+      host:
+        - ycm-cmake-modules
+        - sharedlibpp
+      run_exports:
+        - ${{ pin_subpackage('libdinrail', upper_bound='x.x') }}
+    tests:
+      - package_contents:
+          lib:
+            - dinrail
+      - package_contents:
+          include:
+            - dinrail/Device.h
+
+  - package:
+      name: dinrail-devices
+    build:
+      number: 0
+      script:
+        - cmake -S src/devices -B build-dinrail-devices -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
+        - cmake --build build-dinrail-devices -j ${CPU_COUNT}
+        - cmake --install build-dinrail-devices
+    requirements:
+      build:
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - cmake
+        - ninja
+        - pkg-config
+      host:
+        - ${{ pin_subpackage('libdinrail', exact=True) }}
+        - ycm-cmake-modules
+        - sharedlibpp
+      run:
+        - ${{ pin_subpackage('libdinrail', exact=True) }}
+    tests:
+      - package_contents:
+          files:
+            - lib/*dinrail-device-fakeMotionControl*
+
+  - package:
+      name: dinrail-tools
+    build:
+      number: 0
+      script:
+        # Workaround: these subprojects currently include ../../DinrailCMakeCommon.cmake.
+        - ln -sf cmake/DinrailCMakeCommon.cmake DinrailCMakeCommon.cmake
+        - cmake -S src/cli -B build-dinrail-tools -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
+        - cmake --build build-dinrail-tools -j ${CPU_COUNT}
+        - cmake --install build-dinrail-tools
+    requirements:
+      build:
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - cmake
+        - ninja
+        - pkg-config
+      host:
+        - ${{ pin_subpackage('libdinrail', exact=True) }}
+        - cli11
+        - ycm-cmake-modules
+        - sharedlibpp
+      run:
+        - ${{ pin_subpackage('libdinrail', exact=True) }}
+    tests:
+      - script:
+          - dinrail --help
+
+  - package:
+      name: dinrail
+    requirements:
+      run:
+        - ${{ pin_subpackage('libdinrail', exact=True) }}
+        - ${{ pin_subpackage('dinrail-devices', exact=True) }}
+        - ${{ pin_subpackage('dinrail-tools', exact=True) }}
+
+  - package:
+      name: libdinrail-yarp
+    build:
+      script:
+        # Workaround: these subprojects currently include ../../DinrailCMakeCommon.cmake.
+        - ln -sf cmake/DinrailCMakeCommon.cmake DinrailCMakeCommon.cmake
+        - cmake -S src/yarp -B build-libdinrail-yarp -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
+        - cmake --build build-libdinrail-yarp -j ${CPU_COUNT}
+        - cmake --install build-libdinrail-yarp
+    requirements:
+      build:
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - cmake
+        - ninja
+        - pkg-config
+      host:
+        - libdinrail
+        - yarp
+        - ycm-cmake-modules
+        - sharedlibpp
+      run_exports:
+        - ${{ pin_subpackage('libdinrail-yarp', upper_bound='x.x') }}
+    tests:
+      - package_contents:
+          lib:
+            - dinrail-yarp-conversions
+      - package_contents:
+          include:
+            - dinrail/YarpPropertyConverter.h
+
+  - package:
+      name: dinrail-yarp-devices
+    build:
+      number: 0
+      script:
+        # Workaround: these subprojects currently include ../../DinrailCMakeCommon.cmake.
+        - ln -sf cmake/DinrailCMakeCommon.cmake DinrailCMakeCommon.cmake
+        - cmake -S src/yarp-devices -B build-dinrail-yarp-devices -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
+        - cmake --build build-dinrail-yarp-devices -j ${CPU_COUNT}
+        - cmake --install build-dinrail-yarp-devices
+    requirements:
+      build:
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - cmake
+        - ninja
+        - pkg-config
+      host:
+        - ${{ pin_subpackage('libdinrail', exact=True) }}
+        - ${{ pin_subpackage('libdinrail-yarp', exact=True) }}
+        - libyarp
+        - ycm-cmake-modules
+        - sharedlibpp
+    tests:
+      - package_contents:
+          files:
+            - share/yarp/plugins/*
+
+  - package:
+      name: dinrail-yarp
+    requirements:
+      run:
+        - ${{ pin_subpackage('libdinrail-yarp', exact=True) }}
+        - ${{ pin_subpackage('dinrail-yarp-devices', exact=True) }}
+
+about:
+  homepage: https://github.com/gbionics/dinrail
+  summary: Lightweight robot device abstraction framework.
+  license: BSD-3-Clause
+  license_file: LICENSE
+  repository: https://github.com/gbionics/dinrail
+
+extra:
+  recipe-maintainers:
+    - traversaro
